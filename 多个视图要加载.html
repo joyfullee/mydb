@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>Page Title</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="animate.css">
+    <link rel="stylesheet" href="js/bootstrap/css/bootstrap.min.css">
+
+    <script src="js/vue.js"></script>
+    <script src="js/vue-router.min.js"></script>
+    <script src="js/axios.min.js"></script>
+    <style>
+      
+    .router-link-active{
+        color: brown;
+        display: inline-block;
+    }
+    </style>
+</head>
+<body>
+    <div id="box">
+        <!-- 路由导航标签 -->
+        <router-link :to="{name:'home'}" tag="span">首页</router-link>
+        <router-link :to="{name:'about'}" tag="span">关于</router-link>
+        <router-link :to="{name:'other'}" tag="span">其他</router-link>
+        <!-- 配置容器 -->
+        <transition-group 
+            enter-active-class="animated bounceInDown"
+            leave-active-class="animated bounceOutRight"
+
+        >
+                <router-view key='1'></router-view>
+
+                <router-view name='page' key='2'></router-view>  
+
+
+
+        </transition-group>
+           
+    </div>
+    <!-- 配置template模板 -->
+    <template id="home">
+        <div>
+            <h3>我是首页</h3>
+            <!-- 给首页添加个商品列表 -->
+            <ul>
+                <li v-for="item in arr"><router-link :to="{name:'detail',query:{id:item.goodsID}}">{{item.goodsName}}</router-link></li>
+            </ul>
+            <!-- jie shu-->
+            <button class="btn btn-success" @click="tap()">跳转</button>
+        </div>
+    </template>
+    <template id="about">
+        <div>
+            <h3>我是关于页</h3>
+        </div>
+    </template>
+    <template id="other">
+        <div>
+            <h3>我是其它页</h3>
+        </div>
+    </template>
+    <template id="detail">
+            <div>
+                <h3>产品详情</h3>
+                <p>{{str}}</p>
+            </div>
+    </template>
+</body>
+<script>
+    // 将组件模板声明成对象,每个视图要加载的页面
+    var Home={
+        template:"#home",
+        data:function(){
+            return{
+                arr:[]
+            }          
+        },
+        methods:{
+            tap(){
+                router.push('/other')    //编程式路由跳转
+            },           
+        },
+        mounted(){
+                // console.log(this.$route.params.id)
+                var _this=this;
+                axios(" http://datainfo.duapp.com/shopdata/getGoods.php",{
+                    methods:'get',
+                    params:{callback:""}
+                }).then(function(data){
+                    let str=eval(data.data)   //把后台数据赋值给str,在将str给前端的arr
+                     console.log(str)
+                     _this.arr=str;
+                })
+            }
+    }
+    var About={
+        template:"#about"
+    }
+    var Other={
+        template:"#other"
+    }
+    var Detail={
+        template:"#detail",
+        data:function(){
+            return{
+                str:""
+            }
+        },
+        mounted(){
+            var _this=this;
+            axios("http://datainfo.duapp.com/shopdata/getGoods.php",{
+                method:"get",
+                params:{callback:"",goodsID:_this.$route.query.id}
+            }).then(function(data){
+                // console.log(data.data)
+                _this.str=eval(data.data)[0].detail;
+
+            })
+        }
+
+    }
+    // 配置路由规则  routes保存多个路由
+    var routes=[
+        {path:"/home",name:"home",component:Home},
+        {path:"/abouts",name:"about",components:{default:About,'page':Other}},
+        {path:"/otherss",name:"other",component:Other},
+        {path:"/",redirect:"/home"},
+        {path:"/detail",name:"detail",component:Detail},
+
+
+    ]
+    // 路由规则---->vue路由对象------>实例化路由对象
+    var router=new VueRouter({
+        routes:routes
+    })
+
+    var vm=new Vue({
+        el:"#box",
+        router:router
+    })
+</script>
+</html>

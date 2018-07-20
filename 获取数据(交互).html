@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8">
+		<title>获取数据</title>
+		<script src="../vue.js" type="text/javascript" charset="utf-8"></script>
+		<script src="https://cdn.bootcss.com/axios/0.18.0/axios.js"></script>
+		<script src="https://cdn.bootcss.com/fetch/2.0.4/fetch.js"></script>
+		<script src="https://cdn.bootcss.com/vue-resource/1.5.1/vue-resource.min.js"></script>
+	</head>
+	<body>
+		<div id="out">
+			<input type="button" @click="tap()" value="点击"/>
+		</div>
+		
+		
+		
+		
+		<script type="text/javascript">
+			var vm = new Vue({
+				el:"#out",
+				data:{
+					
+				},
+				methods:{
+					/*tap(){
+						axios({
+							method:'get',
+							url:'data.json'					
+						}).then(function(data){
+							console.log(data.data)
+						}).catch(function(err){
+							console.log(err)
+						})
+					}*/
+					/* tap(){
+					 	fetch('data.json')
+					 	.then(function(data){
+					 		return data.json()
+					 	})
+					 	.then(function(data){
+					 		console.log(data)
+					 	})
+					 	
+					 }*/
+					
+					tap(){
+					var api = "https://sp0.baidu.com/5a1Fazu8AA54nxGko9WTAnF6hhy/su?wd=爱奇艺";
+					 var that = this;
+					 this.$http.jsonp(api,{
+					 	jsonp:'cb'
+					 }).then(function(data){
+					 	console.log(data.body.s);
+					 	that.list = data.body.s;
+					 },function(){
+					 	
+					 })
+					}
+										 					 
+			    }				
+			})
+			
+			
+			
+			
+			
+		</script>
+		
+		
+	</body>
+</html>
